@@ -70,6 +70,7 @@ namespace GomokuOnlineDummyClient
             //Console.WriteLine("Game finished");
 
             // Logout
+            Thread.Sleep(2000);
             LogoutRequestDto logoutRequestDto = new LogoutRequestDto()
             {
                 UserId = MyInfo.Instance.UserId,
