@@ -67,6 +67,9 @@ namespace GomokuOnlineDummyClient
             // Ranking
             await Rankings();
 
+            // Stamina
+            await Stamina();
+
             // Match / Game
             for (int i = 0; i < iterations; i++)
             {
