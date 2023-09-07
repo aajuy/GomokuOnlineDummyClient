@@ -62,12 +62,18 @@ namespace GomokuOnlineDummyClient
             await Rankings();
 
             // Match
-            Match();
+            //Match();
             //Console.WriteLine("Match finished");
 
             // Game
-            Game();
+            //Game();
             //Console.WriteLine("Game finished");
+
+            for (int i = 0; i < 10; i++)
+            {
+                Match();
+                Game();
+            }
 
             // Logout
             Thread.Sleep(2000);
