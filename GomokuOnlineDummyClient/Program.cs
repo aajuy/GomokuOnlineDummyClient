@@ -21,11 +21,17 @@ namespace GomokuOnlineDummyClient
 
         static void Main(string[] args)
         {
-            int result = Test().Result;
+            if (args.Length == 0)
+            {
+                return;
+            }
+
+            int iterations = Int32.Parse(args[0]);
+            int result = Test(iterations).Result;
             Console.WriteLine(result);
         }
 
-        static async Task<int> Test()
+        static async Task<int> Test(int iterations)
         {
             // Start stopwatch
             Stopwatch stopWatch = new Stopwatch();
@@ -61,15 +67,8 @@ namespace GomokuOnlineDummyClient
             // Ranking
             await Rankings();
 
-            // Match
-            //Match();
-            //Console.WriteLine("Match finished");
-
-            // Game
-            //Game();
-            //Console.WriteLine("Game finished");
-
-            for (int i = 0; i < 10; i++)
+            // Match / Game
+            for (int i = 0; i < iterations; i++)
             {
                 Match();
                 Game();
