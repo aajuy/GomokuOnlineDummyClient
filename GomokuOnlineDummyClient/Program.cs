@@ -27,20 +27,18 @@ namespace GomokuOnlineDummyClient
             }
 
             int iterations = Int32.Parse(args[0]);
-            int result = Test(iterations).Result;
-            Console.WriteLine(result);
+            Test(iterations).Wait();
         }
 
-        static async Task<int> Test(int iterations)
+        static async Task Test(int iterations)
         {
-            // Start stopwatch
-            Stopwatch stopWatch = new Stopwatch();
-            stopWatch.Start();
-
-            // New account
+            // Create new account
             Guid guid = Guid.NewGuid();
             string username = guid.ToString().Substring(0, 12);
             string password = guid.ToString().Substring(12, 12);
+
+            // Create stopwatch
+            Stopwatch stopWatch = new Stopwatch();
 
             // Register
             RegisterRequestDto registerRequestDto = new RegisterRequestDto()
@@ -48,8 +46,10 @@ namespace GomokuOnlineDummyClient
                 Username = username,
                 Password = password
             };
+            stopWatch.Start();
             await Register(registerRequestDto);
-            //Console.WriteLine("Register finished");
+            stopWatch.Stop();
+            Console.WriteLine($"Register:{stopWatch.ElapsedMilliseconds}");
 
             // Login
             LoginRequestDto loginRequestDto = new LoginRequestDto()
@@ -57,24 +57,38 @@ namespace GomokuOnlineDummyClient
                 Username = username,
                 Password = password
             };
+            stopWatch.Restart();
             LoginResponseDto loginResponseDto = await Login(loginRequestDto);
+            stopWatch.Stop();
+            Console.WriteLine($"Login:{stopWatch.ElapsedMilliseconds}");
             MyInfo.Instance.UserId = loginResponseDto.UserId;
             MyInfo.Instance.SessionId = loginResponseDto.SessionId;
             ServerConfig.MatchServerAddress = loginResponseDto.MatchServerAddress;
             ServerConfig.GameServerAddress = loginResponseDto.GameServerAddress;
-            //Console.WriteLine("Login finished");
 
             // Ranking
+            stopWatch.Restart();
             await Rankings();
+            stopWatch.Stop();
+            Console.WriteLine($"Ranking:{stopWatch.ElapsedMilliseconds}");
 
             // Stamina
+            stopWatch.Restart();
             await Stamina();
+            stopWatch.Stop();
+            Console.WriteLine($"Stamina:{stopWatch.ElapsedMilliseconds}");
 
             // Match / Game
             for (int i = 0; i < iterations; i++)
             {
+                stopWatch.Restart();
                 Match();
+                stopWatch.Stop();
+                Console.WriteLine($"Match:{stopWatch.ElapsedMilliseconds}");
+                stopWatch.Restart();
                 Game();
+                stopWatch.Stop();
+                Console.WriteLine($"Game:{stopWatch.ElapsedMilliseconds}");
             }
 
             // Logout
@@ -83,14 +97,10 @@ namespace GomokuOnlineDummyClient
                 UserId = MyInfo.Instance.UserId,
                 SessionId = MyInfo.Instance.SessionId
             };
+            stopWatch.Restart();
             await Logout(logoutRequestDto);
-
-            // Stop stopwatch
             stopWatch.Stop();
-
-            // Add result to executionTimes
-            TimeSpan ts = stopWatch.Elapsed;
-            return (int)ts.TotalSeconds;
+            Console.WriteLine($"Logout:{stopWatch.ElapsedMilliseconds}");
         }
 
         static async Task Register(RegisterRequestDto registerRequestDto)
