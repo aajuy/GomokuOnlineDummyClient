@@ -6,6 +6,7 @@ using GomokuOnlineDummyClient.Match.Packet;
 using Google.Protobuf.MatchProtocol;
 using System.Diagnostics;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Net.Sockets;
 using System.Text.Json;
@@ -128,7 +129,8 @@ namespace GomokuOnlineDummyClient
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri("http://" + ServerConfig.MatchServerAddress);
-                await client.GetAsync($"match/stamina/{MyInfo.Instance.UserId}");
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("SessionId", MyInfo.Instance.SessionId);
+                await client.GetAsync($"stamina/{MyInfo.Instance.UserId}");
             }
         }
 
