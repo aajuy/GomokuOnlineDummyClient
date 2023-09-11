@@ -15,7 +15,10 @@ namespace GomokuOnlineDummyClient
 {
     class Program
     {
+        static HttpClient client = new HttpClient();
+
         static Stopwatch stopWatch = new Stopwatch();
+
         static JsonSerializerOptions options = new JsonSerializerOptions
         {
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase
@@ -86,54 +89,41 @@ namespace GomokuOnlineDummyClient
 
         static async Task Register(RegisterRequestDto registerRequestDto)
         {
-            using (HttpClient client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(ServerConfig.LoginServerAddress);
-                stopWatch.Restart();
-                await client.PostAsJsonAsync("register", registerRequestDto);
-                stopWatch.Stop();
-                Console.WriteLine($"Register:{stopWatch.ElapsedMilliseconds}");
-            }
+            string address = ServerConfig.LoginServerAddress + "/register";
+            stopWatch.Restart();
+            await client.PostAsJsonAsync(address, registerRequestDto);
+            stopWatch.Stop();
+            Console.WriteLine($"Register:{stopWatch.ElapsedMilliseconds}");
         }
 
         static async Task<LoginResponseDto> Login(LoginRequestDto loginRequestDto)
         {
-            using (HttpClient client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(ServerConfig.LoginServerAddress);
-                HttpResponseMessage response = await client.PostAsJsonAsync("login", loginRequestDto, options);
-                stopWatch.Restart();
-                LoginResponseDto loginResponseDto = await response.Content.ReadFromJsonAsync<LoginResponseDto>(options);
-                stopWatch.Stop();
-                Console.WriteLine($"Login:{stopWatch.ElapsedMilliseconds}");
-                return loginResponseDto;
-            }
+            string address = ServerConfig.LoginServerAddress + "/login";
+            stopWatch.Restart();
+            HttpResponseMessage response = await client.PostAsJsonAsync(address, loginRequestDto, options);
+            stopWatch.Stop();
+            Console.WriteLine($"Login:{stopWatch.ElapsedMilliseconds}");
+            LoginResponseDto loginResponseDto = await response.Content.ReadFromJsonAsync<LoginResponseDto>(options);
+            return loginResponseDto;
         }
 
         static async Task Stamina()
         {
-            using (HttpClient client = new HttpClient())
-            {
-                client.BaseAddress = new Uri("http://" + ServerConfig.MatchServerAddress);
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("SessionId", MyInfo.Instance.SessionId);
-                stopWatch.Restart();
-                await client.GetAsync($"stamina/{MyInfo.Instance.UserId}");
-                stopWatch.Stop();
-                Console.WriteLine($"Stamina:{stopWatch.ElapsedMilliseconds}");
-            }
+            string address = "http://" + ServerConfig.MatchServerAddress + $"/stamina/{MyInfo.Instance.UserId}";
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("SessionId", MyInfo.Instance.SessionId);
+            stopWatch.Restart();
+            await client.GetAsync(address);
+            stopWatch.Stop();
+            Console.WriteLine($"Stamina:{stopWatch.ElapsedMilliseconds}");
         }
 
         static async Task Rankings()
         {
-            using (HttpClient client = new HttpClient())
-            {
-                client.BaseAddress = new Uri("http://" + ServerConfig.MatchServerAddress);
-                stopWatch.Restart();
-                HttpResponseMessage response = await client.GetAsync("ranking?from=1&to=99");
-                stopWatch.Stop();
-                Console.WriteLine($"Ranking:{stopWatch.ElapsedMilliseconds}");
-                RankingEntry[] rankingEntries = await response.Content.ReadFromJsonAsync<RankingEntry[]>(options);
-            }
+            string address = "http://" + ServerConfig.MatchServerAddress + $"/ranking?from=1&to=99";
+            stopWatch.Restart();
+            HttpResponseMessage response = await client.GetAsync(address);
+            stopWatch.Stop();
+            Console.WriteLine($"Ranking:{stopWatch.ElapsedMilliseconds}");
         }
 
         static void Match()
@@ -227,14 +217,11 @@ namespace GomokuOnlineDummyClient
 
         static async Task Logout(LogoutRequestDto logoutRequestDto)
         {
-            using (HttpClient client = new HttpClient())
-            {
-                client.BaseAddress = new Uri(ServerConfig.LoginServerAddress);
-                stopWatch.Restart();
-                await client.PostAsJsonAsync("logout", logoutRequestDto);
-                stopWatch.Stop();
-                Console.WriteLine($"Logout:{stopWatch.ElapsedMilliseconds}");
-            }
+            string address = ServerConfig.LoginServerAddress + "/logout";
+            stopWatch.Restart();
+            await client.PostAsJsonAsync(address, logoutRequestDto);
+            stopWatch.Stop();
+            Console.WriteLine($"Logout:{stopWatch.ElapsedMilliseconds}");
         }
     }
 }
